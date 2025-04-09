@@ -8,14 +8,20 @@
 #include <Adafruit_SSD1306.h>
 #include <HTTPClient.h>
 #include <time.h>
+#include <DHT.h>
 #include "espwebserver.h"
 #include "secrets.h"
 #include "icons.h"
-#include "logToGoogleSheets.h"
+// #include "logToGoogleSheets.h"
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define OLED_RESET -1
+
+#define DHTPIN 19     // Digital pin connected to the DHT sensor
+#define DHTTYPE DHT22 // DHT 22  (AM2302), AM2321
+// Initialize DHT sensor.
+DHT dht(DHTPIN, DHTTYPE);
 
 #define CLEAR_SKY_ICON "https://cdn-icons-png.flaticon.com/512/3222/3222800.png"
 #define RAIN_ICON "https://cdn-icons-png.flaticon.com/512/1312/1312359.png"
@@ -44,13 +50,18 @@ void setup()
     while (true)
       ;
   }
-  delay(2000);
+  delay(1000);
   display.clearDisplay();
-
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 0);
 
+  display.println("setting up DHT22");
+  dht.begin();
+  delay(500);
+
+  display.clearDisplay();
+  display.setCursor(0, 0);
   // connect to wifi
   display.print("Connecting to WiFi...");
   display.display();
@@ -92,16 +103,15 @@ void setup()
   display.display();
   delay(1500);
 
-  server.on("/", [](AsyncWebServerRequest *request){
-    handleRoot(request, temperature, humidity, weather, updated, png_icon);
-  });
+  server.on("/", [](AsyncWebServerRequest *request)
+            { handleRoot(request, temperature, humidity, weather, updated, png_icon); });
 
   server.addHandler(&events); // Register SSE handler
   server.begin();
   Serial.println("Connect Web Server at http://localhost:80");
 
   // updateWeather();
-  logToGoogleSheetSetUp();
+  // logToGoogleSheetSetUp();
 }
 
 unsigned long previousWeatherMillis = 0;
@@ -109,10 +119,36 @@ const unsigned long weatherUpdateInterval = 3000; // 30 seconds
 
 void loop()
 {
+  // Wait a few seconds between measurements.
+  delay(2000);
+
+  // Reading temperature or humidity takes about 250 milliseconds!
+  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+  float h = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+  float t = dht.readTemperature();
+
+  // Check if any reads failed and exit early (to try again).
+  if (isnan(h) || isnan(t))
+  {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+
+  // Compute heat index in Celsius (isFahreheit = false)
+  float hic = dht.computeHeatIndex(t, h, false);
+
+  Serial.print(F("Humidity: "));
+  Serial.println(String(h) + "%");
+  Serial.print(F("Temperature: "));
+  Serial.println(String(t) + "°C");
+  Serial.print(F("Heat index: "));
+  Serial.println(String(hic) + "°C");
+
   if (WiFi.status() == WL_CONNECTED)
-  {    
+  {
     unsigned long currentMillis = millis();
-    
+
     // Check if 30 seconds have passed
     if (currentMillis - previousWeatherMillis >= weatherUpdateInterval || previousWeatherMillis == 0)
     {
@@ -120,7 +156,7 @@ void loop()
 
       // Calling weather update function
       updateWeather();
-      logToGoogleSheet(updated, temperature, humidity, weather);
+      // logToGoogleSheet(updated, temperature, humidity, weather);
       sendWeatherUpdate(png_icon, temperature, humidity, weather, updated);
     }
   }

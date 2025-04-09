@@ -10,6 +10,14 @@
       "top": 89.54,
       "left": -134.17,
       "attrs": { "i2cAddress": "0x3c" }
+    },
+    { "type": "wokwi-dht22", "id": "dht1", "top": 105.9, "left": 157.8, "attrs": {} },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 157.55,
+      "left": 297.6,
+      "attrs": { "value": "10000" }
     }
   ],
   "connections": [
@@ -18,7 +26,12 @@
     [ "oled1:GND", "esp:GND.1", "black", [ "v-67.2", "h76.8", "v124.8" ] ],
     [ "oled1:SCL", "esp:22", "green", [ "v-105.6", "h269.1", "v86.4" ] ],
     [ "oled1:SDA", "esp:21", "green", [ "v-124.8", "h278.47", "v19.2", "h0", "v76.8" ] ],
-    [ "oled1:VCC", "esp:3V3", "red", [ "v-96", "h86.55" ] ]
+    [ "oled1:VCC", "esp:3V3", "red", [ "v-96", "h86.55" ] ],
+    [ "dht1:VCC", "esp:3V3", "red", [ "v96", "h201.6", "v-403.2", "h-384", "v115.2" ] ],
+    [ "dht1:GND", "esp:GND.3", "black", [ "v28.8", "h38.4", "v-163.2" ] ],
+    [ "dht1:SDA", "esp:19", "green", [ "v67.2", "h96.1", "v-192", "h-19.2" ] ],
+    [ "r1:1", "esp:19", "green", [ "v0", "h-19.2", "v-67.2" ] ],
+    [ "dht1:VCC", "r1:2", "red", [ "v96", "h201.6", "v0", "h0", "v-153.6" ] ]
   ],
   "dependencies": {}
 }

@@ -13,12 +13,14 @@ This project uses an ESP32 microcontroller to fetch and display real-time weathe
 - Updates automatically every 30 seconds
 - Simple web dashboard which keeps data updated without refreshing the page throguh Server Sent Events
 - Log data directly to Google Sheets for every updates
+- Measure data through DHT22 and compare them with API data
 
 
 ## 🧰 Tools Used
 
 - [ESP32](https://www.espressif.com/en/products/socs/esp32)
 - [Wokwi Simulator](https://wokwi.com/)
+- DHT22 Temperature and Humidity Sensor
 - VS Code + PlatformIO
 - SSD1306 OLED Display (I2C)
 - OpenWeatherMap API
