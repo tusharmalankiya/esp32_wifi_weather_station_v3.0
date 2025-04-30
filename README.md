@@ -1,7 +1,7 @@
 
 # 🌤️ ESP32 Wi-Fi Weather Station
 
-This project uses an ESP32 microcontroller to measure tempreture, humidity and weather condition from the DHT22 sensors. It also fetches and compares these data from the OpenWeatherMap API and display real-time weather information  on an OLED display. Additionally, the ESP32 functions as a web server, hosting a responsive web-based weather dashboard accessible over the local network.
+This project uses an ESP32 microcontroller to measure temperature, humidity and weather condition from the DHT22 sensors. It also fetches and compares these data from the OpenWeatherMap API and display real-time weather information  on an OLED display, and logs the data on Google Sheets for every updates. Additionally, the ESP32 functions as a web server, hosting a responsive web-based weather dashboard accessible over the local network. 
 
 ---
 
